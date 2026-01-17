@@ -13,6 +13,7 @@
                 ?>
                 
                 <form action="/register" method="POST" id="registerForm" novalidate>
+                    <input type="hidden" name="_csrf_token" value="<?= \App\Core\Session::csrfToken() ?>">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
                         <input type="text" 

@@ -45,7 +45,31 @@ class Session
         } elseif (time() - $_SESSION['_last_regeneration'] > 300) {
             self::regenerate();
         }
+
+        // Initialize CSRF token if not present
+        if (!isset($_SESSION['_csrf_token'])) {
+            $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+        }
     }
+
+    /**
+     * Get CSRF token
+     */
+    public static function csrfToken(): string
+    {
+        self::start();
+        return $_SESSION['_csrf_token'];
+    }
+
+    /**
+     * Verify CSRF token
+     */
+    public static function verifyCsrfToken(?string $token): bool
+    {
+        self::start();
+        return isset($_SESSION['_csrf_token']) && hash_equals($_SESSION['_csrf_token'], (string) $token);
+    }
+
 
     /**
      * Regenerate session ID

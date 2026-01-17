@@ -54,6 +54,7 @@
                         </h5>
                         
                         <form action="/products/<?= $product->id ?>/purchase" method="POST" id="purchaseForm">
+                            <input type="hidden" name="_csrf_token" value="<?= \App\Core\Session::csrfToken() ?>">
                             <div class="mb-3">
                                 <label for="quantity" class="form-label">Quantity</label>
                                 <div class="input-group">

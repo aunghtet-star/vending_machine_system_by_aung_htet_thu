@@ -20,6 +20,7 @@
                 ?>
                 
                 <form action="/products" method="POST" id="productForm" novalidate>
+                    <input type="hidden" name="_csrf_token" value="<?= \App\Core\Session::csrfToken() ?>">
                     <div class="mb-3">
                         <label for="name" class="form-label">
                             Product Name <span class="text-danger">*</span>

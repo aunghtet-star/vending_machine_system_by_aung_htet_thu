@@ -103,11 +103,12 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <form action="/logout" method="POST" class="d-inline">
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
-                                    </button>
-                                </form>
+<form action="/logout" method="POST" class="d-inline">
+                            <input type="hidden" name="_csrf_token" value="<?= \App\Core\Session::csrfToken() ?>">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
                             </li>
                         </ul>
                     </li>

@@ -21,6 +21,7 @@
                 ?>
                 
                 <form action="/products/<?= $product->id ?>" method="POST" id="productForm" novalidate>
+                    <input type="hidden" name="_csrf_token" value="<?= \App\Core\Session::csrfToken() ?>">
                     <input type="hidden" name="_method" value="PUT">
                     
                     <div class="mb-3">
