@@ -6,13 +6,13 @@
 return [
     'name' => 'Vending Machine System',
     'version' => '1.0.0',
-    'debug' => getenv('APP_DEBUG') ?: true,
-    'url' => getenv('APP_URL') ?: 'http://localhost:8000',
+    'debug' => env('APP_DEBUG', true),
+    'url' => env('APP_URL', 'http://localhost:8000'),
     'timezone' => 'UTC',
     
     // JWT Configuration
     'jwt' => [
-        'secret' => getenv('JWT_SECRET') ?: 'your-secret-key-change-in-production',
+        'secret' => env('JWT_SECRET', 'your-secret-key-change-in-production'),
         'algorithm' => 'HS256',
         'expiry' => 3600, // 1 hour
         'issuer' => 'vending-machine-api',

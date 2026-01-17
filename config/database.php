@@ -6,11 +6,11 @@
  */
 
 return [
-    'host' => getenv('DB_HOST') ?: 'localhost',
-    'port' => getenv('DB_PORT') ?: '3306',
-    'database' => getenv('DB_NAME') ?: 'vending_machine',
-    'username' => getenv('DB_USER') ?: 'root',
-    'password' => getenv('DB_PASS') ?: 'aung@189Htet',
+    'host' => env('DB_HOST', 'localhost'),
+    'port' => env('DB_PORT', '3306'),
+    'database' => env('DB_NAME', 'vending_machine'),
+    'username' => env('DB_USER', 'root'),
+    'password' => env('DB_PASS', ''),
     'charset' => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
     'options' => [
