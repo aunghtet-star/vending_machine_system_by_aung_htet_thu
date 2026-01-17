@@ -127,7 +127,7 @@ class Product
             'price' => $data['price'],
             'quantity_available' => $data['quantity_available'] ?? 0,
             'image_url' => $data['image_url'] ?? null,
-            'is_active' => $data['is_active'] ?? true,
+            'is_active' => isset($data['is_active']) ? (int) $data['is_active'] : 1,
         ]);
 
         return $this->find($id);
@@ -156,7 +156,7 @@ class Product
             $updateData['image_url'] = $data['image_url'];
         }
         if (isset($data['is_active'])) {
-            $updateData['is_active'] = $data['is_active'];
+            $updateData['is_active'] = (int) $data['is_active'];
         }
 
         if (empty($updateData)) {
@@ -188,7 +188,7 @@ class Product
      */
     public function deactivate(): bool
     {
-        return $this->update(['is_active' => false]);
+        return $this->update(['is_active' => 0]);
     }
 
     /**

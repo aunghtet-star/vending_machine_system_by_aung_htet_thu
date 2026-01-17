@@ -144,7 +144,7 @@ class User
             'password' => password_hash($data['password'], PASSWORD_DEFAULT, ['cost' => 12]),
             'role' => $data['role'] ?? 'user',
             'balance' => $data['balance'] ?? 0.00,
-            'is_active' => $data['is_active'] ?? true,
+            'is_active' => isset($data['is_active']) ? (int) $data['is_active'] : 1,
         ]);
 
         return $this->find($id);
@@ -173,7 +173,7 @@ class User
             $updateData['balance'] = $data['balance'];
         }
         if (isset($data['is_active'])) {
-            $updateData['is_active'] = $data['is_active'];
+            $updateData['is_active'] = (int) $data['is_active'];
         }
 
         if (empty($updateData)) {
