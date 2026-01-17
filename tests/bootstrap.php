@@ -10,35 +10,46 @@ ini_set('display_errors', 1);
 // Define base path
 define('BASE_PATH', dirname(__DIR__));
 
-// Autoload classes
-spl_autoload_register(function ($class) {
-    $prefix = 'App\\';
-    $baseDir = BASE_PATH . '/src/';
+// Load Composer autoloader
+if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
+    require BASE_PATH . '/vendor/autoload.php';
     
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // Check for Test namespace
-        $testPrefix = 'Tests\\';
-        $testBaseDir = BASE_PATH . '/tests/';
+    // Load environment variables for testing if .env exists
+    if (file_exists(BASE_PATH . '/.env')) {
+        $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
+        $dotenv->safeLoad();
+    }
+} else {
+    // Autoload classes manually if vendor/autoload.php is not found
+    spl_autoload_register(function ($class) {
+        $prefix = 'App\\';
+        $baseDir = BASE_PATH . '/src/';
         
-        $testLen = strlen($testPrefix);
-        if (strncmp($testPrefix, $class, $testLen) === 0) {
-            $relativeClass = substr($class, $testLen);
-            $file = $testBaseDir . str_replace('\\', '/', $relativeClass) . '.php';
-            if (file_exists($file)) {
-                require $file;
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) !== 0) {
+            // Check for Test namespace
+            $testPrefix = 'Tests\\';
+            $testBaseDir = BASE_PATH . '/tests/';
+            
+            $testLen = strlen($testPrefix);
+            if (strncmp($testPrefix, $class, $testLen) === 0) {
+                $relativeClass = substr($class, $testLen);
+                $file = $testBaseDir . str_replace('\\', '/', $relativeClass) . '.php';
+                if (file_exists($file)) {
+                    require $file;
+                }
             }
+            return;
         }
-        return;
-    }
-    
-    $relativeClass = substr($class, $len);
-    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-    
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+        
+        $relativeClass = substr($class, $len);
+        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+        
+        if (file_exists($file)) {
+            require $file;
+        }
+    });
+}
 
 // Mock session for testing
 if (!function_exists('session_start_mock')) {

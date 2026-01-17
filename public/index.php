@@ -16,6 +16,12 @@ define('BASE_PATH', dirname(__DIR__));
 // Load Composer autoloader if available, otherwise use custom autoloader
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require BASE_PATH . '/vendor/autoload.php';
+    
+    // Load environment variables
+    if (file_exists(BASE_PATH . '/.env')) {
+        $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
+        $dotenv->load();
+    }
 } else {
     // Custom autoloader for when Composer is not available
     spl_autoload_register(function ($class) {
