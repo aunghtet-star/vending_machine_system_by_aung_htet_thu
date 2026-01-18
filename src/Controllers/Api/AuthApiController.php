@@ -9,24 +9,27 @@ namespace App\Controllers\Api;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Core\Request;
 use App\Models\User;
-use App\Services\JWTService;
 use App\Services\TokenServiceInterface;
 
 class AuthApiController extends Controller
 {
-    private TokenServiceInterface $jwtService;
+    private TokenServiceInterface $tokenService;
     private User $userModel;
     private Database $db;
+    private Request $request;
 
     public function __construct(
-        ?TokenServiceInterface $jwtService = null,
-        ?User $userModel = null,
-        ?Database $db = null
+        TokenServiceInterface $tokenService,
+        User $userModel,
+        Database $db,
+        Request $request
     ) {
-        $this->db = $db ?? Database::getInstance();
-        $this->jwtService = $jwtService ?? new JWTService($this->db);
-        $this->userModel = $userModel ?? new User($this->db);
+        $this->tokenService = $tokenService;
+        $this->userModel = $userModel;
+        $this->db = $db;
+        $this->request = $request;
 
         header('Content-Type: application/json');
     }
@@ -73,13 +76,13 @@ class AuthApiController extends Controller
         }
 
         // Generate tokens
-        $accessToken = $this->jwtService->generateToken([
+        $accessToken = $this->tokenService->generateToken([
             'user_id' => $user->id,
             'username' => $user->username,
             'role' => $user->role,
         ]);
 
-        $refreshToken = $this->jwtService->generateRefreshToken($user->id);
+        $refreshToken = $this->tokenService->generateRefreshToken($user->id);
 
         // Update last login
         $this->db->update(
@@ -157,13 +160,13 @@ class AuthApiController extends Controller
             ]);
 
             // Generate tokens
-            $accessToken = $this->jwtService->generateToken([
+            $accessToken = $this->tokenService->generateToken([
                 'user_id' => $user->id,
                 'username' => $user->username,
                 'role' => $user->role,
             ]);
 
-            $refreshToken = $this->jwtService->generateRefreshToken($user->id);
+            $refreshToken = $this->tokenService->generateRefreshToken($user->id);
 
             $this->json([
                 'success' => true,
@@ -201,7 +204,7 @@ class AuthApiController extends Controller
             return;
         }
 
-        $userId = $this->jwtService->validateRefreshToken($refreshToken);
+        $userId = $this->tokenService->validateRefreshToken($refreshToken);
 
         if (!$userId) {
             $this->json([
@@ -222,16 +225,16 @@ class AuthApiController extends Controller
         }
 
         // Revoke old refresh token
-        $this->jwtService->revokeRefreshToken($refreshToken);
+        $this->tokenService->revokeRefreshToken($refreshToken);
 
         // Generate new tokens
-        $accessToken = $this->jwtService->generateToken([
+        $accessToken = $this->tokenService->generateToken([
             'user_id' => $user->id,
             'username' => $user->username,
             'role' => $user->role,
         ]);
 
-        $newRefreshToken = $this->jwtService->generateRefreshToken($user->id);
+        $newRefreshToken = $this->tokenService->generateRefreshToken($user->id);
 
         $this->json([
             'success' => true,
@@ -253,7 +256,7 @@ class AuthApiController extends Controller
         $refreshToken = $this->input('refresh_token');
 
         if ($refreshToken) {
-            $this->jwtService->revokeRefreshToken($refreshToken);
+            $this->tokenService->revokeRefreshToken($refreshToken);
         }
 
         $this->json([
@@ -268,7 +271,9 @@ class AuthApiController extends Controller
      */
     public function me(): void
     {
-        if (!isset($GLOBALS['api_user'])) {
+        $authUser = $this->request->user();
+
+        if (!$authUser) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -276,7 +281,7 @@ class AuthApiController extends Controller
             return;
         }
 
-        $user = $this->userModel->find($GLOBALS['api_user']['id']);
+        $user = $this->userModel->find($authUser['id']);
 
         if (!$user) {
             $this->json([

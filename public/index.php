@@ -7,6 +7,7 @@
  */
 
 use App\Core\Container;
+use App\Core\Request;
 use App\Services\TokenServiceInterface;
 use App\Services\JWTService;
 use App\Core\Database;
@@ -65,6 +66,10 @@ $container->bind(Database::class, function() {
     return Database::getInstance();
 });
 
+// Initialize Request and bind to Container
+$request = new Request();
+$container->singleton(Request::class, $request);
+
 // Load application config
 $config = require BASE_PATH . '/config/app.php';
 
@@ -76,8 +81,8 @@ date_default_timezone_set($config['timezone']);
 $router = require BASE_PATH . '/routes/web.php';
 
 // Get request method and URI
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
+$method = $request->method();
+$uri = $request->uri();
 
 // Dispatch the request
 try {

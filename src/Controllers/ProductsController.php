@@ -25,17 +25,17 @@ class ProductsController extends Controller
     private Database $db;
 
     public function __construct(
-        ?Product $productModel = null,
-        ?Transaction $transactionModel = null,
-        ?User $userModel = null,
-        ?AuthService $authService = null,
-        ?Database $db = null
+        Product $productModel,
+        Transaction $transactionModel,
+        User $userModel,
+        AuthService $authService,
+        Database $db
     ) {
-        $this->db = $db ?? Database::getInstance();
-        $this->productModel = $productModel ?? new Product($this->db);
-        $this->transactionModel = $transactionModel ?? new Transaction($this->db);
-        $this->userModel = $userModel ?? new User($this->db);
-        $this->authService = $authService ?? new AuthService($this->db);
+        $this->productModel = $productModel;
+        $this->transactionModel = $transactionModel;
+        $this->userModel = $userModel;
+        $this->authService = $authService;
+        $this->db = $db;
     }
 
     /**

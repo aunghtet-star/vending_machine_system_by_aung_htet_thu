@@ -7,16 +7,20 @@
 
 namespace App\Middleware;
 
-use App\Services\JWTService;
+use App\Core\Request;
 use App\Services\TokenServiceInterface;
 
 class ApiAuthMiddleware
 {
-    private TokenServiceInterface $jwtService;
+    private TokenServiceInterface $tokenService;
+    private Request $request;
 
-    public function __construct(?TokenServiceInterface $jwtService = null)
-    {
-        $this->jwtService = $jwtService ?? new JWTService();
+    public function __construct(
+        TokenServiceInterface $tokenService,
+        Request $request
+    ) {
+        $this->tokenService = $tokenService;
+        $this->request = $request;
     }
 
     /**
@@ -24,7 +28,7 @@ class ApiAuthMiddleware
      */
     public function handle(): bool|array
     {
-        $token = $this->jwtService->getTokenFromHeader();
+        $token = $this->tokenService->getTokenFromHeader();
 
         if (!$token) {
             http_response_code(401);
@@ -34,7 +38,7 @@ class ApiAuthMiddleware
             ];
         }
 
-        $payload = $this->jwtService->validateToken($token);
+        $payload = $this->tokenService->validateToken($token);
 
         if (!$payload) {
             http_response_code(401);
@@ -44,12 +48,12 @@ class ApiAuthMiddleware
             ];
         }
 
-        // Store user info in global for access in controllers
-        $GLOBALS['api_user'] = [
+        // Store user info in Request object
+        $this->request->setUser([
             'id' => $payload['user_id'],
             'username' => $payload['username'],
             'role' => $payload['role']
-        ];
+        ]);
 
         return true;
     }

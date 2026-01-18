@@ -48,6 +48,8 @@ class Container
         // If it's a closure, execute it
         if ($concrete instanceof \Closure) {
             $object = $concrete($this);
+        } elseif (is_object($concrete)) {
+            $object = $concrete;
         } else {
             // Use reflection to resolve
             $object = $this->resolve($concrete);

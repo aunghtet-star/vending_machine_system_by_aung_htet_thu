@@ -8,6 +8,7 @@
 namespace App\Controllers\Api;
 
 use App\Core\Controller;
+use App\Core\Request;
 use App\Models\Transaction;
 use App\Models\User;
 
@@ -15,13 +16,16 @@ class TransactionsApiController extends Controller
 {
     private Transaction $transactionModel;
     private User $userModel;
+    private Request $request;
 
     public function __construct(
-        ?Transaction $transactionModel = null,
-        ?User $userModel = null
+        Transaction $transactionModel,
+        User $userModel,
+        Request $request
     ) {
-        $this->transactionModel = $transactionModel ?? new Transaction();
-        $this->userModel = $userModel ?? new User();
+        $this->transactionModel = $transactionModel;
+        $this->userModel = $userModel;
+        $this->request = $request;
 
         header('Content-Type: application/json');
     }
@@ -32,7 +36,8 @@ class TransactionsApiController extends Controller
      */
     public function index(): void
     {
-        if (!isset($GLOBALS['api_user'])) {
+        $authUser = $this->request->user();
+        if (!$authUser) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -43,8 +48,8 @@ class TransactionsApiController extends Controller
         $page = (int) ($this->input('page') ?? 1);
         $perPage = (int) ($this->input('per_page') ?? 10);
 
-        $userId = $GLOBALS['api_user']['id'];
-        $isAdmin = $GLOBALS['api_user']['role'] === 'admin';
+        $userId = $authUser['id'];
+        $isAdmin = $authUser['role'] === 'admin';
 
         $result = $this->transactionModel->paginate(
             $page,
@@ -71,7 +76,8 @@ class TransactionsApiController extends Controller
     public function show(string $id): void
     {
         $id = (int) $id;
-        if (!isset($GLOBALS['api_user'])) {
+        $authUser = $this->request->user();
+        if (!$authUser) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -90,8 +96,8 @@ class TransactionsApiController extends Controller
         }
 
         // Check authorization
-        $isAdmin = $GLOBALS['api_user']['role'] === 'admin';
-        if (!$isAdmin && $transaction->userId !== $GLOBALS['api_user']['id']) {
+        $isAdmin = $authUser['role'] === 'admin';
+        if (!$isAdmin && $transaction->userId !== $authUser['id']) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -111,7 +117,8 @@ class TransactionsApiController extends Controller
      */
     public function balance(): void
     {
-        if (!isset($GLOBALS['api_user'])) {
+        $authUser = $this->request->user();
+        if (!$authUser) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -119,7 +126,7 @@ class TransactionsApiController extends Controller
             return;
         }
 
-        $user = $this->userModel->find($GLOBALS['api_user']['id']);
+        $user = $this->userModel->find($authUser['id']);
 
         if (!$user) {
             $this->json([

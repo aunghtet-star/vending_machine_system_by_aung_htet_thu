@@ -9,6 +9,7 @@ namespace App\Controllers\Api;
 
 use App\Core\Controller;
 use App\Core\Database;
+use App\Core\Request;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\User;
@@ -19,17 +20,20 @@ class ProductsApiController extends Controller
     private Transaction $transactionModel;
     private User $userModel;
     private Database $db;
+    private Request $request;
 
     public function __construct(
-        ?Product $productModel = null,
-        ?Transaction $transactionModel = null,
-        ?User $userModel = null,
-        ?Database $db = null
+        Product $productModel,
+        Transaction $transactionModel,
+        User $userModel,
+        Database $db,
+        Request $request
     ) {
-        $this->db = $db ?? Database::getInstance();
-        $this->productModel = $productModel ?? new Product($this->db);
-        $this->transactionModel = $transactionModel ?? new Transaction($this->db);
-        $this->userModel = $userModel ?? new User($this->db);
+        $this->productModel = $productModel;
+        $this->transactionModel = $transactionModel;
+        $this->userModel = $userModel;
+        $this->db = $db;
+        $this->request = $request;
 
         // Set JSON content type
         header('Content-Type: application/json');
@@ -257,7 +261,8 @@ class ProductsApiController extends Controller
     {
         $id = (int) $id;
         // Get authenticated user from API middleware
-        if (!isset($GLOBALS['api_user'])) {
+        $authUser = $this->request->user();
+        if (!$authUser) {
             $this->json([
                 'success' => false,
                 'error' => 'Unauthorized'
@@ -265,7 +270,7 @@ class ProductsApiController extends Controller
             return;
         }
 
-        $userId = $GLOBALS['api_user']['id'];
+        $userId = $authUser['id'];
         $product = $this->productModel->find($id);
 
         if (!$product) {
