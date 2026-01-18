@@ -30,8 +30,6 @@ IoC Container: A centralized Service Container manages the instantiation and dep
 Middleware Pipeline: Security is handled through a non-blocking Middleware layer. This ensures that business logic in the Controllers is only executed for authenticated and authorized requests.
 
 
-
-
 ## Installation
 
 ### 1. Clone the Repository
