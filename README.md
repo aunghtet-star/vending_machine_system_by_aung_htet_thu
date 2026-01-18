@@ -20,6 +20,18 @@ A robust PHP application for a vending machine system with product management, i
 - Composer (for dependency management)
 - Apache with mod_rewrite or Nginx
 
+🏗️ System Architecture
+This project follows a decoupled, Service-Oriented Architecture (SOA) within a custom MVC framework.
+
+Dependency Inversion (SOLID): All core services (Authentication, Database, etc.) are injected via Interfaces. This allows the application to remain agnostic of specific implementations.
+
+IoC Container: A centralized Service Container manages the instantiation and dependency resolution of all Controllers and Middleware, serving as the "Single Point of Change" for the entire application.
+
+Middleware Pipeline: Security is handled through a non-blocking Middleware layer. This ensures that business logic in the Controllers is only executed for authenticated and authorized requests.
+
+
+
+
 ## Installation
 
 ### 1. Clone the Repository
@@ -313,14 +325,4 @@ composer test:coverage
 - JWT tokens with HMAC-SHA256 signing
 - Role-based access control
 
-## License
 
-MIT License
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
