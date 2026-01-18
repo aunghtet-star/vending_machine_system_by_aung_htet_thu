@@ -7,7 +7,9 @@
 
 use App\Core\Router;
 
-$router = new Router();
+// Check if $container is available (passed from index.php)
+$container = $container ?? null;
+$router = new Router($container);
 
 // ============================================
 // Web Routes (with session-based auth)

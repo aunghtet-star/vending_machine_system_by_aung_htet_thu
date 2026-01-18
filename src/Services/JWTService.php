@@ -9,7 +9,7 @@ namespace App\Services;
 
 use App\Core\Database;
 
-class JWTService
+class JWTService implements TokenServiceInterface
 {
     private array $config;
     private Database $db;

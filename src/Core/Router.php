@@ -16,6 +16,12 @@ class Router
     private array $middleware = [];
     private array $groupMiddleware = [];
     private string $groupPrefix = '';
+    private ?Container $container;
+
+    public function __construct(?Container $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Add a GET route
@@ -171,7 +177,12 @@ class Router
                 foreach ($route['middleware'] as $middleware) {
                     $middlewareClass = "App\\Middleware\\{$middleware}";
                     if (class_exists($middlewareClass)) {
-                        $middlewareInstance = new $middlewareClass();
+                        if ($this->container) {
+                            $middlewareInstance = $this->container->get($middlewareClass);
+                        } else {
+                            $middlewareInstance = new $middlewareClass();
+                        }
+                        
                         $result = $middlewareInstance->handle();
                         if ($result !== true) {
                             return $result;
@@ -202,7 +213,11 @@ class Router
             [$controller, $method] = $handler;
             
             if (is_string($controller)) {
-                $controller = new $controller();
+                if ($this->container) {
+                    $controller = $this->container->get($controller);
+                } else {
+                    $controller = new $controller();
+                }
             }
 
             return call_user_func_array([$controller, $method], $params);

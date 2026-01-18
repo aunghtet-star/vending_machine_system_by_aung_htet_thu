@@ -11,15 +11,16 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Models\User;
 use App\Services\JWTService;
+use App\Services\TokenServiceInterface;
 
 class AuthApiController extends Controller
 {
-    private JWTService $jwtService;
+    private TokenServiceInterface $jwtService;
     private User $userModel;
     private Database $db;
 
     public function __construct(
-        ?JWTService $jwtService = null,
+        ?TokenServiceInterface $jwtService = null,
         ?User $userModel = null,
         ?Database $db = null
     ) {

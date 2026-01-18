@@ -6,6 +6,11 @@
  * All requests are routed through this file.
  */
 
+use App\Core\Container;
+use App\Services\TokenServiceInterface;
+use App\Services\JWTService;
+use App\Core\Database;
+
 // Error reporting for development
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -51,6 +56,15 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 // Start session
 \App\Core\Session::start();
 
+// Initialize Service Container
+$container = new Container();
+
+// Register Services
+$container->bind(TokenServiceInterface::class, JWTService::class);
+$container->bind(Database::class, function() {
+    return Database::getInstance();
+});
+
 // Load application config
 $config = require BASE_PATH . '/config/app.php';
 
@@ -58,6 +72,7 @@ $config = require BASE_PATH . '/config/app.php';
 date_default_timezone_set($config['timezone']);
 
 // Load routes
+// $container is available in the scope of the included file
 $router = require BASE_PATH . '/routes/web.php';
 
 // Get request method and URI

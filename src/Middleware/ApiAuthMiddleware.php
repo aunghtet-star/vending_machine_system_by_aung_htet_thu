@@ -8,14 +8,15 @@
 namespace App\Middleware;
 
 use App\Services\JWTService;
+use App\Services\TokenServiceInterface;
 
 class ApiAuthMiddleware
 {
-    private JWTService $jwtService;
+    private TokenServiceInterface $jwtService;
 
-    public function __construct()
+    public function __construct(?TokenServiceInterface $jwtService = null)
     {
-        $this->jwtService = new JWTService();
+        $this->jwtService = $jwtService ?? new JWTService();
     }
 
     /**
